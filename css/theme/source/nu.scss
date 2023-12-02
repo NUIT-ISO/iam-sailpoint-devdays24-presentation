@@ -1,0 +1,64 @@
+/**
+ * A simple theme for reveal.js presentations, similar
+ * to the default theme. The accent color is darkblue.
+ *
+ * This theme is Copyright (C) 2012 Owen Versteeg, https://github.com/StereotypicalApps. It is MIT licensed.
+ * reveal.js is Copyright (C) 2011-2012 Hakim El Hattab, http://hakim.se
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+@font-face {
+  font-family: "Akkurat Pro Regular";
+  src: url("https://common.northwestern.edu/v8/css/fonts/AkkuratProRegular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: "Campton Book";
+  src: url("https://common.northwestern.edu/v8/css/fonts/CamptonBook.woff") format("woff");
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: "Campton Bold";
+  src: url("https://common.northwestern.edu/v8/css/fonts/CamptonBold.woff") format("woff");
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: "Akkurat Pro Bold";
+  src: url("https://common.northwestern.edu/v8/css/fonts/AkkuratProBold.woff") format("woff");
+  font-weight: normal;
+  font-style: normal
+}
+
+// Override theme settings (see ../template/settings.scss)
+$mainFont: 'Akkurat Pro', sans-serif;
+$mainColor: #000;
+$headingFont: 'Campton Book', Impact, sans-serif;
+$headingColor: #fff;
+$headingTextShadow: none;
+$headingTextTransform: none;
+$backgroundColor: #fff;
+$linkColor: #4E2A84;
+$linkColorHover: lighten( $linkColor, 20% );
+$selectionBackgroundColor: rgba(0, 0, 0, 0.99);
+
+$overlayElementBgColor: 0, 0, 0;
+$overlayElementFgColor: 240, 240, 240;
+
+// Change text colors against dark slide backgrounds
+@include dark-bg-text-color(#fff);
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------
