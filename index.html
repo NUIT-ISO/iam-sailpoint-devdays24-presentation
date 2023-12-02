@@ -22,7 +22,130 @@
 					<h5>Tuesday, April 9, 2024</h5>
 				</section>
 				<section data-background-image="images/purple.png">
-					Slide 2
+					<h1>Welcome!</h1>
+					<p>
+						The code that you see in this presentation (and then some!) will be made available to you.
+					</p>
+				</section>
+				<section data-background-image="images/purple.png">
+					<section data-background-image="images/purple.png">
+						<h2>Background</h2>
+						<ul>
+							<li class="fragment">Northwestern's identities are called "<span style="color: #5091CD">NetIDs</span>."</li>
+							<li class="fragment">
+								Password expiration occurs in phases:
+								<ul>
+									<li class="fragment">Three phases at which an email is sent about impending expiration...</li>
+									<li class="fragment">...followed by the expiration itself.</li>
+								</ul>
+							</li>
+						</ul>
+					</section>
+					<section data-background-image="images/purple.png">
+						<h2>Technical Details</h2>
+						<ul>
+							<li>
+								Next phase of expiration kept in the <span style="color: #EF553F">non-searchable</span> <code>netIdpasswordNextEvent</code> Identity attribute:
+								<ul>
+									<li><code>firstWarning</code></li>
+									<li><code>secondWarning</code></li>
+									<li><code>thirdWarning</code></li>
+									<li><code>deactivate</code></li>
+								</ul>
+							</li>
+							<li>
+								Timestamp when next phase is to be executed kept in the <code>netIdpasswordExpiration</code> Identity attribute.
+							</li>
+						</ul>
+					</section>
+				</section>
+				<section data-background-image="images/purple.png">
+					<h2>Scenario</h2>
+					<p>
+						Find all NetIDs that have received their third warning
+						and show the date that the password will expire.
+					</p>
+				</section>
+				<section data-background-image="images/purple.png">
+					<section data-background-image="images/purple.png">
+						<h2>Attempt #1</h2>
+						<p>Try using Advanced Analytics.</p>
+					</section>
+					<section data-background-image="images/purple.png">
+						<p>
+							<span style="color: #EF553F">We can't.</span> <code>netIdpasswordNextEvent</code> isn't a searchable attribute, so it doesn't even appear in the list.
+						</p>
+						<p>
+							<img src="images/advancedAnalytics.png" />
+						</p>
+					</section>
+				</section>
+				<section data-background-image="images/purple.png">
+					<section data-background-image="images/purple.png">
+						<h2>Attempt #2</h2>
+						<p>
+							Write a custom <code>Rule</code> that iterates through <code>Identity</code> objects and picks the applicable ones. Then, run the <code>Rule</code> as a one-off.
+						</p>
+					</section>
+					<section data-background-image="images/purple.png">
+						<p>
+							This does actually work! But it comes with some disadvantages:
+							<ul>
+								<li class="fragment">Uncomfortable to run, requiring use of the debug pages or creation of a custom task.</li>
+								<li class="fragment">Exporting data and sending it in an email is fairly complex.</li>
+							</ul>	
+						</p>
+					</section>
+				</section>
+				<section data-background-image="images/purple.png">
+					<section data-background-image="images/purple.png">
+						<h2>Attempt #3</h2>
+						<p>
+							Use a SQL query to isolate the right identities.
+						</p>
+					</section>
+					<section data-background-image="images/purple.png">
+						<p><em>Technically</em> you can do it...</p>
+					</section>
+					<section data-background-image="images/purple.png">
+						<p>...but it's not pretty.</p>
+						<pre><code>SELECT NAME, TIMESTAMP '1970-01-01 00:00:00.000 UTC'
+							+ NUMTODSINTERVAL(
+									TO_NUMBER(REGEXP_SUBSTR(ATTRIBUTES, 
+									  'key="netIdpasswordExpiration"\s+value="(.*?)"', 
+										1, 1, 'i', 1)
+									) / 1000,
+									'SECOND'
+								) AS PWD_EXPIRES
+FROM SPT_IDENTITY
+WHERE TO_CHAR(REGEXP_SUBSTR(ATTRIBUTES, 
+        'key="netIdpasswordNextEvent"\s+value="(.*?)"',
+				1, 1, 'i', 1)) = 'thirdWarning';</code></pre>
+					</section>
+					<section data-background-image="images/purple.png">
+						<p>For a more resilient solution, you <em>could</em> parse the XML:</p>
+						<pre>
+							<code>SELECT NAME, TIMESTAMP '1970-01-01 00:00:00.000 UTC' 
+         + NUMTODSINTERVAL(
+					   TO_NUMBER(
+						   EXTRACTVALUE(XMLTYPE(ATTRIBUTES),
+								 '//entry[@key="netIdpasswordExpiration"]/@value'
+							 )
+						 ) / 1000, 
+						 'SECOND'
+					 ) AS PWD_EXPIRES
+FROM SPT_IDENTITY
+WHERE EXTRACTVALUE(XMLTYPE(ATTRIBUTES), 
+                   '//entry[@key="netIdpasswordNextEvent"]/@value'
+									) = 'thirdWarning';</code>
+						</pre>
+					</section>
+					<section data-background-image="images/purple.png">
+						<p>
+							Any SQL solution also suffers from the same issues of not being able to easily export data
+							or schedule the report.
+						</p>
+					</section>
 				</section>
 			</div>
 		</div>
